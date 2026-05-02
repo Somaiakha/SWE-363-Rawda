@@ -60,52 +60,7 @@ Content-Type: application/json
   "email": "Raghada@gmail.com",
   "password": "123456"
 }
-
 ###
-POST http://localhost:5050/api/auth/register
-Content-Type: application/json
-
-{
-  "name": "Dr. Lina Alharbi",
-  "email": "linaNEW@gmail.com",
-  "password": "123456",
-  "role": "expert",
-  "yearsExperience": 10,
-  "bio": "Expert in plants",
-  "certificates": ["Cert 1"],
-  "expertStatus": "Pending"
-}
-
+GET http://localhost:5050/api/users
 ###
-POST http://localhost:5050/api/question
-Content-Type: application/json
-
-{
-  "title": "Inappropriate language in plant discussion",
-  "content": "This post was reported because it contains inappropriate language.",
-  "author": "User123",
-  "reports": 5,
-  "status": "Active"
-}
-
-###
-GET http://localhost:5050/api/reviews
-
-###
-
-POST http://localhost:5050/api/question
-Content-Type: application/json
-
-{
-  "title": "Spam link in comment section",
-  "content": "This post was reported because it includes spam links.",
-  "author": "SpamBot99",
-  "reports": 12,
-  "status": "Active"
-}
-
-
-
-
-
-
+GET http://localhost:5050/api/users
