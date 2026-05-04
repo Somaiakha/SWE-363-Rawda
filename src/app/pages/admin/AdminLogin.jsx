@@ -4,6 +4,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -23,7 +24,7 @@ export default function AdminLogin() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          email: username,   // 👈 username field = email
+          email: username,
           password: password
         })
       });
@@ -31,19 +32,18 @@ export default function AdminLogin() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.message || "Invalid username/password");
+        setError(data.message || "Invalid email/password");
         setIsLoading(false);
         return;
       }
 
-      // 🔐 Allow only admin
       if (data.user.role !== "admin") {
         setError("Access denied. Admin only.");
         setIsLoading(false);
         return;
       }
 
-      // ✅ Save user
+      localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
       showToast("Login Successfully");
@@ -52,7 +52,7 @@ export default function AdminLogin() {
         navigate("/admin/dashboard");
       }, 1000);
 
-    } catch (error) {
+    } catch (err) {
       setError("Server error. Make sure backend is running.");
     }
 
@@ -65,49 +65,46 @@ export default function AdminLogin() {
   };
 
   return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
         <div className="w-full max-w-md">
 
-          {/* Logo & Title */}
+          {/* Header */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-[#4CAF50] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <span className="text-3xl">🛡️</span>
+            <div className="w-16 h-16 bg-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
+              <span className="text-2xl">🛡️</span>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Rawda Admin Panel</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Rawda Admin Panel</h1>
             <p className="text-gray-600">Secure administrator access</p>
           </div>
 
-          {/* Login Card */}
-          <div className="bg-white rounded-2xl shadow-xl p-8">
-            <form onSubmit={handleLogin} className="space-y-6">
+          {/* Card */}
+          <div className="bg-white rounded-xl shadow-lg p-8">
 
-              {/* Username (Email) */}
+            <form onSubmit={handleLogin} className="space-y-5">
+
+              {/* Email */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email
-                </label>
+                <label className="text-sm text-gray-700 block mb-1">Email</label>
                 <input
                     type="email"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Enter your email"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50]"
+                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
                     required
                 />
               </div>
 
               {/* Password */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Password
-                </label>
+                <label className="text-sm text-gray-700 block mb-1">Password</label>
                 <div className="relative">
                   <input
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50]"
+                      className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
                       required
                   />
                   <button
@@ -122,16 +119,16 @@ export default function AdminLogin() {
 
               {/* Error */}
               {error && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                    <p className="text-red-700 text-sm text-center">{error}</p>
+                  <div className="bg-red-50 border border-red-200 text-red-600 text-sm p-3 rounded-lg text-center">
+                    {error}
                   </div>
               )}
 
-              {/* Button */}
+              {/* Login Button */}
               <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full px-6 py-3 bg-[#4CAF50] text-white rounded-lg hover:bg-[#45a049] disabled:bg-gray-300 flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2 disabled:bg-gray-300"
               >
                 {isLoading ? (
                     <>
@@ -143,20 +140,27 @@ export default function AdminLogin() {
                 )}
               </button>
 
+              {/* ✅ BACK BUTTON (what you wanted) */}
+              <button
+                  type="button"
+                  onClick={() => navigate("/")}
+                  className="w-full py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+              >
+                ← Back to Main App
+              </button>
+
             </form>
 
-            {/* Real credentials */}
-            <div className="mt-6 pt-6 border-t text-center text-sm text-gray-500">
-              <p>Use your MongoDB account:</p>
-              <p>Email: <b>your_email@gmail.com</b></p>
-              <p>Password: <b>your_password</b></p>
+            {/* Info */}
+            <div className="mt-6 pt-4 border-t text-center text-sm text-gray-500">
+              <p>Use your MongoDB account</p>
             </div>
           </div>
         </div>
 
         {/* Toast */}
         {toast && (
-            <div className="fixed top-8 right-8 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg">
+            <div className="fixed top-6 right-6 bg-green-600 text-white px-5 py-2 rounded-lg shadow">
               ✓ {toast}
             </div>
         )}

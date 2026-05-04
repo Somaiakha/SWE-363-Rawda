@@ -18,6 +18,7 @@ const questionSchema = new mongoose.Schema(
     likes: { type: Number, default: 0 },
     reports: { type: Number, default: 0 },
     status: { type: String, enum: ["Active", "Warned"], default: "Active" },
+    bookmarks: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     answers: [answerSchema],
   },
   { timestamps: true }

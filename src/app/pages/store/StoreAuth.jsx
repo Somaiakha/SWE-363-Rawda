@@ -28,38 +28,77 @@ export default function StoreAuth() {
     setError("");
     setIsLoading(true);
 
-    setTimeout(() => {
-      if (loginEmail === "store@rawda.com" && loginPassword === "store123") {
-        showToast("Login Successfully");
-        setTimeout(() => {
-          navigate("/store");
-        }, 1000);
-      } else {
-        setError("Invalid email/password");
-        setIsLoading(false);
+    try {
+      const res = await fetch("http://localhost:5050/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || "Invalid email or password");
+        return;
       }
-    }, 1500);
+
+      if (data.user.role !== "store") {
+        setError("Access denied. Store accounts only.");
+        return;
+      }
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      showToast("Login Successfully");
+      setTimeout(() => navigate("/store"), 1000);
+    } catch {
+      setError("Server error. Make sure backend is running.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
+
+    if (registerPassword.length < 8) {
+      setError("Password must be at least 8 characters");
+      return;
+    }
+
     setIsLoading(true);
 
-    setTimeout(() => {
-      if (registerEmail === "existing@example.com") {
-        setError("Email already registered.");
-        setIsLoading(false);
-      } else if (registerPassword.length < 8) {
-        setError("Password must be at least 8 characters");
-        setIsLoading(false);
-      } else {
-        showToast("Account created successfully.");
-        setTimeout(() => {
-          navigate("/store");
-        }, 1000);
+    try {
+      const res = await fetch("http://localhost:5050/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: storeName,
+          email: registerEmail,
+          password: registerPassword,
+          role: "store",
+          phone,
+          location,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || "Registration failed");
+        return;
       }
-    }, 1500);
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      showToast("Account created successfully.");
+      setTimeout(() => navigate("/store"), 1000);
+    } catch {
+      setError("Server error. Make sure backend is running.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleLogoUpload = (e) => {
@@ -186,8 +225,8 @@ export default function StoreAuth() {
               <div className="mt-4 pt-4 border-t border-gray-200">
                 <p className="text-xs text-gray-500 text-center mb-2">Demo credentials:</p>
                 <div className="bg-gray-50 rounded-lg p-3 text-xs font-mono text-gray-700">
-                  <p>Email: <span className="font-semibold">store@rawda.com</span></p>
-                  <p>Password: <span className="font-semibold">store123</span></p>
+                  <p>Email: <span className="font-semibold">store@test.com</span></p>
+                  <p>Password: <span className="font-semibold">test1234</span></p>
                 </div>
               </div>
             </form>

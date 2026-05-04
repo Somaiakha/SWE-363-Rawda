@@ -1,54 +1,79 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { Edit, Save, X, MapPin, Phone, Mail, Building } from "lucide-react";
 
 export default function StoreProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [toast, setToast] = useState(null);
-  
+
   const [formData, setFormData] = useState({
-    storeName: "Green Haven Plant Store",
-    email: "contact@greenhaven.com",
-    phone: "+1 (555) 123-4567",
-    location: "123 Garden Street, Plant City, CA 90210",
-    about: "Premium plant store specializing in indoor plants, outdoor plants, and complete gardening solutions. We provide expert advice and quality products for all your gardening needs.",
+    storeName: "",
+    email: "",
+    phone: "",
+    location: "",
+    about: "",
   });
 
   const [errors, setErrors] = useState({});
 
+  useEffect(() => {
+    fetchStore();
+  }, []);
+
+  const fetchStore = async () => {
+    try {
+      const res = await axios.get("http://localhost:5050/api/stores");
+
+      if (res.data) {
+        setFormData({
+          storeName: res.data.name || "",
+          email: res.data.email || "",
+          phone: res.data.phone || "",
+          location: res.data.location || "",
+          about: res.data.about || "",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const validateForm = () => {
-const newErrors = {};    
-    if (!formData.storeName.trim()) {
-      newErrors.storeName = "Store name is required";
-    }
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Invalid email format";
-    }
-    if (!formData.phone.trim()) {
-      newErrors.phone = "Phone is required";
-    } else if (!/^\+?[\d\s\-\(\)]+$/.test(formData.phone)) {
-      newErrors.phone = "Invalid phone format";
-    }
-    if (!formData.location.trim()) {
-      newErrors.location = "Location is required";
-    }
+    const newErrors = {};
+
+    if (!formData.storeName.trim()) newErrors.storeName = "Store name required";
+    if (!formData.email.trim()) newErrors.email = "Email required";
+    if (!formData.phone.trim()) newErrors.phone = "Phone required";
+    if (!formData.location.trim()) newErrors.location = "Location required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSave = () => {
-    if (validateForm()) {
-      showToast("Profile updated successfully.");
+  const handleSave = async () => {
+    if (!validateForm()) return;
+
+    try {
+      await axios.put("http://localhost:5050/api/stores", {
+        name: formData.storeName,
+        email: formData.email,
+        phone: formData.phone,
+        location: formData.location,
+        about: formData.about,
+      });
+
+      await fetchStore();
+
+      showToast("Profile updated successfully");
       setIsEditing(false);
-    } else {
-      showToast("Update failed. Please check highlighted fields.");
+    } catch (error) {
+      console.log(error);
+      showToast("Update failed");
     }
   };
 
-  const showToast = (message) => {
-    setToast(message);
+  const showToast = (msg) => {
+    setToast(msg);
     setTimeout(() => setToast(null), 3000);
   };
 
@@ -60,159 +85,121 @@ const newErrors = {};
       </div>
 
       <div className="bg-white rounded-xl shadow-sm p-8">
-        {/* Store Logo & Name Header */}
-        <div className="flex items-center gap-6 mb-8 pb-8 border-b border-gray-200">
-          <div className="w-24 h-24 bg-gradient-to-br from-orange-500 to-amber-500 rounded-xl flex items-center justify-center text-4xl">
+        <div className="flex items-center gap-6 mb-8 pb-8 border-b">
+          <div className="w-24 h-24 bg-orange-500 rounded-xl flex items-center justify-center text-4xl">
             🏪
           </div>
+
           <div className="flex-1">
             {isEditing ? (
               <input
-                type="text"
                 value={formData.storeName}
-                onChange={(e) => setFormData({ ...formData, storeName: e.target.value })}
-                className={`text-2xl font-bold w-full px-3 py-2 border rounded-lg ${
-                  errors.storeName ? "border-red-500" : "border-gray-300"
-                }`}
+                onChange={(e) =>
+                  setFormData({ ...formData, storeName: e.target.value })
+                }
+                className="w-full border px-3 py-2 rounded-lg text-2xl font-bold"
               />
             ) : (
-              <h2 className="text-2xl font-bold text-gray-900">{formData.storeName}</h2>
+              <h2 className="text-2xl font-bold">{formData.storeName}</h2>
             )}
-            {errors.storeName && <p className="text-red-500 text-sm mt-1">{errors.storeName}</p>}
           </div>
+
           {!isEditing && (
             <button
               onClick={() => setIsEditing(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+              className="bg-orange-600 text-white px-4 py-2 rounded-lg"
             >
-              <Edit className="w-4 h-4" />
-              Edit Profile
+              <Edit className="w-4 h-4 inline mr-2" />
+              Edit
             </button>
           )}
         </div>
 
-        {/* Contact Information */}
-        <div className="space-y-6">
-          <h3 className="text-lg font-semibold text-gray-900">Contact Information</h3>
-          
+        <div className="space-y-5">
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-              <Mail className="w-4 h-4" />
-              Email
+            <label className="font-medium flex gap-2 mb-2">
+              <Mail className="w-4 h-4" /> Email
             </label>
-            {isEditing ? (
-              <>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className={`w-full px-4 py-2 border rounded-lg ${
-                    errors.email ? "border-red-500" : "border-gray-300"
-                  }`}
-                />
-                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-              </>
-            ) : (
-              <p className="text-gray-900 px-4 py-2 bg-gray-50 rounded-lg">{formData.email}</p>
-            )}
+            <input
+              disabled={!isEditing}
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+              className="w-full border px-4 py-2 rounded-lg"
+            />
           </div>
 
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-              <Phone className="w-4 h-4" />
-              Phone
+            <label className="font-medium flex gap-2 mb-2">
+              <Phone className="w-4 h-4" /> Phone
             </label>
-            {isEditing ? (
-              <>
-                <input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className={`w-full px-4 py-2 border rounded-lg ${
-                    errors.phone ? "border-red-500" : "border-gray-300"
-                  }`}
-                />
-                {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
-              </>
-            ) : (
-              <p className="text-gray-900 px-4 py-2 bg-gray-50 rounded-lg">{formData.phone}</p>
-            )}
+            <input
+              disabled={!isEditing}
+              value={formData.phone}
+              onChange={(e) =>
+                setFormData({ ...formData, phone: e.target.value })
+              }
+              className="w-full border px-4 py-2 rounded-lg"
+            />
           </div>
 
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-              <MapPin className="w-4 h-4" />
-              Location
+            <label className="font-medium flex gap-2 mb-2">
+              <MapPin className="w-4 h-4" /> Location
             </label>
-            {isEditing ? (
-              <>
-                <input
-                  type="text"
-                  value={formData.location}
-                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  className={`w-full px-4 py-2 border rounded-lg ${
-                    errors.location ? "border-red-500" : "border-gray-300"
-                  }`}
-                />
-                {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location}</p>}
-              </>
-            ) : (
-              <p className="text-gray-900 px-4 py-2 bg-gray-50 rounded-lg">{formData.location}</p>
-            )}
+            <input
+              disabled={!isEditing}
+              value={formData.location}
+              onChange={(e) =>
+                setFormData({ ...formData, location: e.target.value })
+              }
+              className="w-full border px-4 py-2 rounded-lg"
+            />
           </div>
 
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-              <Building className="w-4 h-4" />
-              About Store
+            <label className="font-medium flex gap-2 mb-2">
+              <Building className="w-4 h-4" /> About
             </label>
-            {isEditing ? (
-              <textarea
-                value={formData.about}
-                onChange={(e) => setFormData({ ...formData, about: e.target.value })}
-                rows={4}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-              />
-            ) : (
-              <p className="text-gray-700 px-4 py-2 bg-gray-50 rounded-lg leading-relaxed">{formData.about}</p>
-            )}
+            <textarea
+              rows="4"
+              disabled={!isEditing}
+              value={formData.about}
+              onChange={(e) =>
+                setFormData({ ...formData, about: e.target.value })
+              }
+              className="w-full border px-4 py-2 rounded-lg"
+            />
           </div>
         </div>
 
-        {/* Action Buttons */}
         {isEditing && (
-          <div className="flex gap-3 mt-8 pt-6 border-t border-gray-200">
+          <div className="flex gap-3 mt-8">
             <button
-              onClick={() => {
-                setIsEditing(false);
-                setErrors({});
-              }}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              onClick={() => setIsEditing(false)}
+              className="flex-1 border py-2 rounded-lg"
             >
-              <X className="w-4 h-4" />
+              <X className="w-4 h-4 inline mr-2" />
               Cancel
             </button>
+
             <button
               onClick={handleSave}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+              className="flex-1 bg-orange-600 text-white py-2 rounded-lg"
             >
-              <Save className="w-4 h-4" />
-              Save Changes
+              <Save className="w-4 h-4 inline mr-2" />
+              Save
             </button>
           </div>
         )}
       </div>
 
-      {/* Toast */}
       {toast && (
-        <div className={`fixed bottom-8 right-8 px-6 py-3 rounded-lg shadow-lg animate-fade-in z-50 ${
-          toast.includes("failed") ? "bg-red-600 text-white" : "bg-gray-900 text-white"
-        }`}>
+        <div className="fixed bottom-8 right-8 bg-black text-white px-5 py-3 rounded-lg">
           {toast}
         </div>
       )}
     </div>
   );
 }
-
-

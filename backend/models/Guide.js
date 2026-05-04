@@ -1,27 +1,20 @@
 const mongoose = require("mongoose");
 
 const guideSchema = new mongoose.Schema(
-  {
-    title: { type: String, required: true, trim: true },
-    content: { type: String, required: true },
-    category: {
-      type: String,
-      enum: ["Vegetable Gardening", "Indoor Plants", "Flowers & Ornamentals", "Pest Control", "Soil Health"],
-      required: true,
+    {
+        title: { type: String, required: true, trim: true },
+        content: { type: String, required: true },
+        submittedBy: { type: String, required: true },
+        category: { type: String, default: "General" },
+        references: { type: [String], default: [] },
+        approvalStatus: {
+            type: String,
+            enum: ["Pending", "Approved", "Revision", "Rejected"],
+            default: "Pending",
+        },
+        feedbackNote: { type: String, default: "" },
     },
-    difficulty: {
-      type: String,
-      enum: ["Beginner", "Intermediate", "Advanced"],
-      default: "Beginner",
-    },
-    author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    status: {
-      type: String,
-      enum: ["Pending", "Approved", "Rejected"],
-      default: "Pending",
-    },
-  },
-  { timestamps: true }
+    { timestamps: true }
 );
 
 module.exports = mongoose.model("Guide", guideSchema);

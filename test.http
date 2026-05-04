@@ -63,4 +63,52 @@ Content-Type: application/json
 ###
 GET http://localhost:5050/api/users
 ###
+POST http://localhost:5050/api/question
+Content-Type: application/json
+
+{
+  "title": "Inappropriate language in plant discussion",
+  "content": "This post was reported because it contains inappropriate language.",
+  "author": "User123",
+  "reports": 5,
+  "status": "Active"
+}
+
+###
+GET http://localhost:5050/api/reviews
+
+###
+
+POST http://localhost:5050/api/question
+Content-Type: application/json
+
+{
+  "title": "Spam link in comment section",
+  "content": "This post was reported because it includes spam links.",
+  "author": "SpamBot99",
+  "reports": 12,
+  "status": "Active"
+}
+
+
+
+
+### Post a question as gardener
+POST http://localhost:5050/api/questions
+Content-Type: application/json
+Authorization: Bearer YOUR_TOKEN_HERE
+
+{
+  "title": "Why are my tomato leaves turning yellow?",
+  "content": "I have been growing tomatoes for 3 weeks and the bottom leaves are turning yellow. I water them every other day. Is this normal?",
+  "tags": ["tomatoes", "outdoor", "watering"]
+}
+
+###
 GET http://localhost:5050/api/users
+
+###
+GET http://localhost:5050/api/questions
+
+###
+GET http://localhost:5050/api/badges/experts

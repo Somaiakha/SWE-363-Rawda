@@ -1,30 +1,25 @@
-import { useState } from "react";
-import ReviewCard from "../components/dashboard/ReviewCard";
+import { useState, useEffect } from "react";
 import { Button } from "../components/ui/Button";
-import { Search, Filter, History, Clock, CheckCircle, XCircle, Eye } from "lucide-react";
+import { Search, Filter, History, Clock, CheckCircle, XCircle, Eye, Loader2 } from "lucide-react";
 
-const initialPending = [
-  { id: "101", title: "Guide: Pruning Hydrangeas for Beginners", status: "Pending", submittedAt: "Yesterday", type: "Guide" },
-  { id: "102", title: "Plant Info: Snake Plant (Sansevieria)", status: "Pending", submittedAt: "2 days ago", type: "Plant Info" },
-  { id: "103", title: "Answer: How to fix clay soil?", status: "Pending", submittedAt: "3 days ago", type: "Answer" },
-  { id: "104", title: "Guide: Companion Planting Chart", status: "Pending", submittedAt: "4 days ago", type: "Guide" },
-  { id: "105", title: "Plant Info: Monstera Deliciosa", status: "Pending", submittedAt: "5 days ago", type: "Plant Info" },
-];
+const API = "http://localhost:5050/api";
 
-const initialHistory = [
-  { id: "201", title: "Guide: Growing Tomatoes in Pots", status: "Approved", submittedAt: "Last Week", type: "Guide" },
-  { id: "202", title: "Answer: Identifying Aphids", status: "Rejected", submittedAt: "2 Weeks Ago", type: "Answer" },
-];
+function authHeaders() {
+  const token = localStorage.getItem("token");
+  return { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
+}
 
 export default function ReviewAnswers() {
   const [activeTab, setActiveTab] = useState("Pending");
-  const [pendingReviews, setPendingReviews] = useState(initialPending);
-  const [historyReviews, setHistoryReviews] = useState(initialHistory);
+  const [pendingReviews, setPendingReviews] = useState([]);
+  const [historyReviews, setHistoryReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedReview, setSelectedReview] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showActionModal, setShowActionModal] = useState(false);
   const [actionType, setActionType] = useState("approve");
   const [feedbackNote, setFeedbackNote] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -33,6 +28,22 @@ export default function ReviewAnswers() {
     setTimeout(() => setToast(null), 3000);
   };
 
+  const fetchGuides = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${API}/guides`, { headers: authHeaders() });
+      const guides = await res.json();
+      setPendingReviews(guides.filter((g) => g.approvalStatus === "Pending"));
+      setHistoryReviews(guides.filter((g) => g.approvalStatus !== "Pending"));
+    } catch {
+      showToast("Failed to load submissions.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchGuides(); }, []);
+
   const handleAction = (review, type) => {
     setSelectedReview(review);
     setActionType(type);
@@ -40,20 +51,51 @@ export default function ReviewAnswers() {
     setShowActionModal(true);
   };
 
-  const confirmAction = () => {
+  const confirmAction = async () => {
     if (!selectedReview) return;
+    setSubmitting(true);
     const newStatus = actionType === "approve" ? "Approved" : "Rejected";
-    setPendingReviews((prev) => prev.filter((r) => r.id !== selectedReview.id));
-    setHistoryReviews((prev) => [{ ...selectedReview, status: newStatus }, ...prev]);
-    showToast(`Submission ${newStatus.toLowerCase()} successfully.`);
-    setShowActionModal(false);
-    setSelectedReview(null);
-    setFeedbackNote("");
+    try {
+      const res = await fetch(`${API}/guides/${selectedReview._id}/status`, {
+        method: "PUT",
+        headers: authHeaders(),
+        body: JSON.stringify({ approvalStatus: newStatus, feedbackNote }),
+      });
+      if (!res.ok) throw new Error();
+      showToast(`Submission ${newStatus.toLowerCase()} successfully.`);
+      setShowActionModal(false);
+      setSelectedReview(null);
+      setFeedbackNote("");
+      await fetchGuides();
+    } catch {
+      showToast("Failed to update submission. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const filteredPending = pendingReviews.filter((r) =>
     r.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const statusBadge = (status) => {
+    const map = {
+      Approved: "bg-green-100 text-green-700",
+      Rejected: "bg-red-100 text-red-700",
+      Revision: "bg-yellow-100 text-yellow-700",
+    };
+    return map[status] || "bg-gray-100 text-gray-700";
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    const diff = Math.floor((Date.now() - d) / 86400000);
+    if (diff === 0) return "Today";
+    if (diff === 1) return "Yesterday";
+    if (diff < 7) return `${diff} days ago`;
+    return d.toLocaleDateString();
+  };
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -96,15 +138,21 @@ export default function ReviewAnswers() {
         </div>
 
         <div className="p-6 space-y-3">
-          {activeTab === "Pending" ? (
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="w-6 h-6 animate-spin text-green-600" />
+            </div>
+          ) : activeTab === "Pending" ? (
             filteredPending.length === 0 ? (
               <p className="text-gray-500 text-center py-8">No pending reviews found.</p>
             ) : (
               filteredPending.map((review) => (
-                <div key={review.id} className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
+                <div key={review._id} className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
                   <div>
                     <p className="text-sm font-medium text-gray-800">{review.title}</p>
-                    <span className="text-xs text-gray-400">{review.submittedAt} · {review.type}</span>
+                    <span className="text-xs text-gray-400">
+                      {formatDate(review.createdAt)} · {review.category || "Guide"} · by {review.submittedBy}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <button onClick={() => { setSelectedReview(review); setShowDetailModal(true); }} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View">
@@ -121,17 +169,23 @@ export default function ReviewAnswers() {
               ))
             )
           ) : (
-            historyReviews.map((review) => (
-              <div key={review.id} className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
-                <div>
-                  <p className="text-sm font-medium text-gray-800">{review.title}</p>
-                  <span className="text-xs text-gray-400">{review.submittedAt} · {review.type}</span>
+            historyReviews.length === 0 ? (
+              <p className="text-gray-500 text-center py-8">No review history yet.</p>
+            ) : (
+              historyReviews.map((review) => (
+                <div key={review._id} className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">{review.title}</p>
+                    <span className="text-xs text-gray-400">
+                      {formatDate(review.updatedAt)} · {review.category || "Guide"} · by {review.submittedBy}
+                    </span>
+                  </div>
+                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${statusBadge(review.approvalStatus)}`}>
+                    {review.approvalStatus}
+                  </span>
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full font-medium ${review.status === "Approved" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                  {review.status}
-                </span>
-              </div>
-            ))
+              ))
+            )
           )}
         </div>
 
@@ -146,9 +200,16 @@ export default function ReviewAnswers() {
             <h3 className="text-xl font-semibold text-gray-900 mb-4">Submission Details</h3>
             <div className="space-y-3 mb-6">
               <p><span className="font-medium">Title:</span> {selectedReview.title}</p>
-              <p><span className="font-medium">Type:</span> {selectedReview.type}</p>
-              <p><span className="font-medium">Submitted:</span> {selectedReview.submittedAt}</p>
-              <p><span className="font-medium">Status:</span> {selectedReview.status}</p>
+              <p><span className="font-medium">Category:</span> {selectedReview.category}</p>
+              <p><span className="font-medium">Submitted by:</span> {selectedReview.submittedBy}</p>
+              <p><span className="font-medium">Submitted:</span> {formatDate(selectedReview.createdAt)}</p>
+              <p><span className="font-medium">Status:</span> {selectedReview.approvalStatus}</p>
+              {selectedReview.content && (
+                <div>
+                  <p className="font-medium mb-1">Content:</p>
+                  <p className="text-sm text-gray-600 bg-gray-50 rounded p-3 max-h-40 overflow-y-auto">{selectedReview.content}</p>
+                </div>
+              )}
             </div>
             <div className="flex gap-3">
               <button onClick={() => setShowDetailModal(false)} className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Close</button>
@@ -165,7 +226,11 @@ export default function ReviewAnswers() {
             <h3 className="text-xl font-semibold text-gray-900 mb-4">
               {actionType === "approve" ? "Approve Submission" : "Reject Submission"}
             </h3>
-            <p className="text-gray-600 mb-4">{actionType === "approve" ? "Approve this submission and make it visible to users?" : "Reject this submission and notify the author?"}</p>
+            <p className="text-gray-600 mb-4">
+              {actionType === "approve"
+                ? "Approve this submission and make it visible to users?"
+                : "Reject this submission and notify the author?"}
+            </p>
             {actionType === "reject" && (
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Feedback (Optional)</label>
@@ -179,8 +244,19 @@ export default function ReviewAnswers() {
               </div>
             )}
             <div className="flex gap-3">
-              <button onClick={() => { setShowActionModal(false); setFeedbackNote(""); }} className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
-              <button onClick={confirmAction} className={`flex-1 px-4 py-2 text-white rounded-lg ${actionType === "approve" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"}`}>
+              <button
+                onClick={() => { setShowActionModal(false); setFeedbackNote(""); }}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                disabled={submitting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmAction}
+                disabled={submitting}
+                className={`flex-1 px-4 py-2 text-white rounded-lg flex items-center justify-center gap-2 ${actionType === "approve" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"} disabled:opacity-60`}
+              >
+                {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
                 Confirm
               </button>
             </div>

@@ -1,3 +1,4 @@
+// src/app/routes.jsx
 import { createBrowserRouter, Navigate } from "react-router";
 import DashboardLayout from "./layouts/DashboardLayout";
 import DashboardHome from "./pages/DashboardHome";
@@ -9,20 +10,21 @@ import SubmitPlantInfo from "./pages/SubmitPlantInfo";
 import Badges from "./pages/Badges";
 import Settings from "./pages/Settings";
 
-// Home Gardener Dashboard Imports
+// Home Gardener
 import GardenerLayout from "./layouts/GardenerLayout";
 import GardenerHome from "./pages/gardener/GardenerHome";
 import PlantCareChatbot from "./pages/gardener/PlantCareChatbot";
 import QAForum from "./pages/gardener/QAForum";
 import ForumQuestionDetail from "./pages/gardener/ForumQuestionDetail";
 import PlantGuides from "./pages/gardener/PlantGuides";
+import GuideDetail from "./pages/gardener/GuideDetail";
 import PlantCareServices from "./pages/gardener/PlantCareServices";
 import RatePlantStores from "./pages/gardener/RatePlantStores";
 import GardenerProfile from "./pages/gardener/GardenerProfile";
 import DeleteAccount from "./pages/gardener/DeleteAccount";
 import AccountDeleted from "./pages/gardener/AccountDeleted";
 
-// Admin Dashboard Imports
+// Admin
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminLayout from "./layouts/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -34,7 +36,7 @@ import ContentApproval from "./pages/admin/ContentApproval";
 import Subscriptions from "./pages/admin/Subscriptions";
 import BadgesSystem from "./pages/admin/BadgesSystem";
 
-// Store Dashboard Imports
+// Store
 import StoreAuth from "./pages/store/StoreAuth";
 import StoreLayout from "./layouts/StoreLayout";
 import StoreDashboard from "./pages/store/StoreDashboard";
@@ -47,22 +49,12 @@ import StoreRatings from "./pages/store/StoreRatings";
 // Login Pages
 import ExpertLogin from "./pages/ExpertLogin";
 import GardenerLogin from "./pages/GardenerLogin";
-
-// Role Selector
 import RoleSelector from "./pages/RoleSelector";
 
 export const router = createBrowserRouter([
-  // Role Selector Landing Page
-  {
-    path: "/",
-    Component: RoleSelector,
-  },
-  // Expert Login
-  {
-    path: "/expert/login",
-    Component: ExpertLogin,
-  },
-  // Gardening Expert Dashboard
+  { path: "/", Component: RoleSelector },
+
+  { path: "/expert/login", Component: ExpertLogin },
   {
     path: "/expert",
     Component: DashboardLayout,
@@ -77,12 +69,9 @@ export const router = createBrowserRouter([
       { path: "settings", Component: Settings },
     ],
   },
-  // Gardener Login
-  {
-    path: "/gardener/login",
-    Component: GardenerLogin,
-  },
-  // Home Gardener Dashboard
+
+  { path: "/gardener/login", Component: GardenerLogin },
+  { path: "/gardener/account-deleted", Component: AccountDeleted },
   {
     path: "/gardener",
     Component: GardenerLayout,
@@ -92,23 +81,15 @@ export const router = createBrowserRouter([
       { path: "forum", Component: QAForum },
       { path: "forum/:id", Component: ForumQuestionDetail },
       { path: "guides", Component: PlantGuides },
+      { path: "guides/:id", Component: GuideDetail },        // ← NEW
       { path: "services", Component: PlantCareServices },
       { path: "ratings", Component: RatePlantStores },
       { path: "profile", Component: GardenerProfile },
       { path: "delete-account", Component: DeleteAccount },
     ],
   },
-  // Account Deleted - standalone page
-  {
-    path: "/gardener/account-deleted",
-    Component: AccountDeleted,
-  },
-  // Store Auth (Login/Register)
-  {
-    path: "/store/login",
-    Component: StoreAuth,
-  },
-  // Store Dashboard
+
+  { path: "/store/login", Component: StoreAuth },
   {
     path: "/store",
     Component: StoreLayout,
@@ -121,12 +102,8 @@ export const router = createBrowserRouter([
       { path: "ratings", Component: StoreRatings },
     ],
   },
-  // Admin Login
-  {
-    path: "/admin/login",
-    Component: AdminLogin,
-  },
-  // Admin Dashboard
+
+  { path: "/admin/login", Component: AdminLogin },
   {
     path: "/admin",
     Component: AdminLayout,
@@ -142,10 +119,6 @@ export const router = createBrowserRouter([
       { path: "badges", Component: BadgesSystem },
     ],
   },
-  // Catch-all redirect
-  {
-    path: "*",
-    Component: () => <Navigate to="/" replace />,
-  },
-]);
 
+  { path: "*", Component: () => <Navigate to="/" replace /> },
+]);

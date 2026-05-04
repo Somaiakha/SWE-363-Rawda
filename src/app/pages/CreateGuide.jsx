@@ -52,7 +52,13 @@ export default function CreateGuide() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ title, content, category, difficulty }),
+        body: JSON.stringify({
+          title,
+          content,
+          category,
+          difficulty,
+          submittedBy: JSON.parse(localStorage.getItem("user") || "{}")?.name || "Unknown",
+        }),
       });
 
       const data = await res.json();
