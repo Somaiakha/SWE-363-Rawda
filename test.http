@@ -46,7 +46,7 @@ Content-Type: application/json
 {
 
   "name": "Raghada",
-  "email": "Raghada@gmail.com",
+  "email": "Raghada2@gmail.com",
   "password": "123456",
   "role": "admin"
 }
@@ -126,3 +126,11 @@ GET http://localhost:5050/api/questions
 
 ###
 GET http://localhost:5050/api/badges/experts
+
+###
+PUT http://localhost:5050/api/experts/PASTE_NOURA_ID_HERE/status
+Content-Type: application/json
+
+{
+  "expertStatus": "Approved"
+}

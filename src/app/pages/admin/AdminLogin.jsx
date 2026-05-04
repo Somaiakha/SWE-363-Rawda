@@ -32,7 +32,7 @@ export default function AdminLogin() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.message || "Invalid email/password");
+        setError(data.message || "Invalid email or password");
         setIsLoading(false);
         return;
       }
@@ -139,7 +139,7 @@ export default function AdminLogin() {
                 )}
               </button>
 
-              {/* ✅ BACK BUTTON (what you wanted) */}
+              {/* Back Button */}
               <button
                   type="button"
                   onClick={() => navigate("/")}
@@ -150,10 +150,15 @@ export default function AdminLogin() {
 
             </form>
 
-            {/* Info */}
+            {/* ✅ DEMO CREDENTIALS (ADDED HERE) */}
             <div className="mt-6 pt-4 border-t text-center text-sm text-gray-500">
-              <p>Use your MongoDB account</p>
+              <p className="font-medium text-gray-700 mb-1">
+                Demo Admin Credentials
+              </p>
+              <p>Email: <b>Raghada1@gmail.com</b></p>
+              <p>Password: <b>123456</b></p>
             </div>
+
           </div>
         </div>
 
