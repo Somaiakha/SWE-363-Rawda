@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { AlertTriangle, Eye, Trash2, CheckCircle } from "lucide-react";
 
 export default function ForumModeration() {
@@ -13,7 +13,7 @@ export default function ForumModeration() {
 
   const fetchPosts = async () => {
     try {
-      const res = await fetch("http://localhost:5050/api/forum");
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/forum`);
       const data = await res.json();
 
       const formatted = data.map((post) => ({

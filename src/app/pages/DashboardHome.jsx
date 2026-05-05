@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import StatCard from "../components/dashboard/StatCard";
 import QuestionCard from "../components/dashboard/QuestionCard";
@@ -22,8 +22,8 @@ export default function DashboardHome() {
     try {
       setIsLoading(true);
       const [questionsRes, guidesRes] = await Promise.all([
-        fetch("http://localhost:5050/api/questions"),
-        fetch("http://localhost:5050/api/guides"),
+        fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/questions`),
+        fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/guides`),
       ]);
 
       const questionsData = await questionsRes.json();

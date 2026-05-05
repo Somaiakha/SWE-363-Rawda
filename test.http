@@ -1,8 +1,21 @@
-### GET request to example server
-GET https://examples.http-client.intellij.net/get
-    ?generated-in=WebStorm
+### =============================================
+### 1. REGISTER ALL ROLES
+### =============================================
+
+### Register Admin
+POST http://localhost:5050/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Raghada",
+  "email": "Raghada@gmail.com",
+  "password": "123456",
+  "role": "admin"
+}
 
 ###
+
+### Register Expert
 POST http://localhost:5050/api/auth/register
 Content-Type: application/json
 
@@ -11,11 +24,13 @@ Content-Type: application/json
   "email": "Somaia@gmail.com",
   "password": "123456",
   "role": "expert",
-  "yearsExperience": 8
+  "yearsExperience": 8,
+  "bio": "Plant care specialist"
 }
 
 ###
 
+### Register Gardener
 POST http://localhost:5050/api/auth/register
 Content-Type: application/json
 
@@ -28,6 +43,7 @@ Content-Type: application/json
 
 ###
 
+### Register Store
 POST http://localhost:5050/api/auth/register
 Content-Type: application/json
 
@@ -38,21 +54,11 @@ Content-Type: application/json
   "role": "store"
 }
 
-###
+### =============================================
+### 2. LOGIN (copy token from response)
+### =============================================
 
-POST http://localhost:5050/api/auth/register
-Content-Type: application/json
-
-{
-
-  "name": "Raghada",
-  "email": "Raghada@gmail.com",
-  "password": "123456",
-  "role": "admin"
-}
-
-
-### LOGIN
+### Login as Admin
 POST http://localhost:5050/api/auth/login
 Content-Type: application/json
 
@@ -60,7 +66,421 @@ Content-Type: application/json
   "email": "Raghada@gmail.com",
   "password": "123456"
 }
+
 ###
-GET http://localhost:5050/api/users
+
+### Login as Expert
+POST http://localhost:5050/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "Somaia@gmail.com",
+  "password": "123456"
+}
+
 ###
+
+### Login as Gardener
+POST http://localhost:5050/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "Sadeem@gmail.com",
+  "password": "123456"
+}
+
+###
+
+### Login as Store
+POST http://localhost:5050/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "Anwar@gmail.com",
+  "password": "123456"
+}
+
+### =============================================
+### 3. USERS
+### =============================================
+
+### Get all users
 GET http://localhost:5050/api/users
+
+###
+
+### Update user role/status (replace USER_ID)
+PUT http://localhost:5050/api/users/USER_ID
+Content-Type: application/json
+
+{
+  "status": "Inactive"
+}
+
+###
+
+### Delete user (replace USER_ID)
+DELETE http://localhost:5050/api/users/USER_ID
+
+### =============================================
+### 4. QUESTIONS (replace TOKEN)
+### =============================================
+
+### Get all questions
+GET http://localhost:5050/api/questions
+
+###
+
+### Get single question (replace QUESTION_ID)
+GET http://localhost:5050/api/questions/QUESTION_ID
+
+###
+
+### Create question
+POST http://localhost:5050/api/questions
+Content-Type: application/json
+Authorization: Bearer TOKEN
+
+{
+  "title": "How often should I water my cactus?",
+  "content": "I have a small cactus and I am not sure how often to water it.",
+  "tags": ["cactus", "watering"]
+}
+
+###
+
+### Add answer to question (replace QUESTION_ID)
+POST http://localhost:5050/api/questions/QUESTION_ID/answers
+Content-Type: application/json
+Authorization: Bearer TOKEN
+
+{
+  "content": "Water your cactus once every 2-3 weeks in summer and once a month in winter."
+}
+
+###
+
+### Like a question (replace QUESTION_ID)
+POST http://localhost:5050/api/questions/QUESTION_ID/like
+Authorization: Bearer TOKEN
+
+###
+
+### Bookmark a question (replace QUESTION_ID)
+POST http://localhost:5050/api/questions/QUESTION_ID/bookmark
+Authorization: Bearer TOKEN
+
+### =============================================
+### 5. GUIDES
+### =============================================
+
+### Get all guides
+GET http://localhost:5050/api/guides
+
+###
+
+### Create a guide
+POST http://localhost:5050/api/guides
+Content-Type: application/json
+
+{
+  "title": "Beginner Guide to Indoor Plants",
+  "content": "Indoor plants need light, water, and the right temperature.",
+  "category": "Indoor Plants",
+  "difficulty": "Beginner"
+}
+
+###
+
+### Approve a guide (replace GUIDE_ID)
+PUT http://localhost:5050/api/guides/GUIDE_ID/status
+Content-Type: application/json
+
+{
+  "approvalStatus": "Approved",
+  "feedbackNote": "Great guide!"
+}
+
+### =============================================
+### 6. EXPERTS
+### =============================================
+
+### Get all expert applications
+GET http://localhost:5050/api/experts
+
+###
+
+### Approve an expert (replace EXPERT_ID)
+PUT http://localhost:5050/api/experts/EXPERT_ID/status
+Content-Type: application/json
+
+{
+  "expertStatus": "Approved"
+}
+
+###
+
+### Reject an expert (replace EXPERT_ID)
+PUT http://localhost:5050/api/experts/EXPERT_ID/status
+Content-Type: application/json
+
+{
+  "expertStatus": "Rejected"
+}
+
+###
+
+### Delete an expert (replace EXPERT_ID)
+DELETE http://localhost:5050/api/experts/EXPERT_ID
+
+### =============================================
+### 7. ADMIN
+### =============================================
+
+### Get admin dashboard stats
+GET http://localhost:5050/api/admin/stats
+
+###
+
+### Get recent activity
+GET http://localhost:5050/api/admin/recent-activity
+
+### =============================================
+### 8. FORUM MODERATION
+### =============================================
+
+### Get reported posts
+GET http://localhost:5050/api/forum
+
+###
+
+### Resolve a reported post (replace POST_ID)
+PUT http://localhost:5050/api/forum/POST_ID/resolve
+
+###
+
+### Delete a post (replace POST_ID)
+DELETE http://localhost:5050/api/forum/POST_ID
+
+### =============================================
+### 9. REVIEWS
+### =============================================
+
+### Get all reviews
+GET http://localhost:5050/api/reviews
+
+###
+
+### Update review (replace REVIEW_ID)
+PUT http://localhost:5050/api/reviews/REVIEW_ID
+Content-Type: application/json
+
+{
+  "verified": true,
+  "flagged": false
+}
+
+###
+
+### Delete review (replace REVIEW_ID)
+DELETE http://localhost:5050/api/reviews/REVIEW_ID
+
+### =============================================
+### 10. PRODUCTS
+### =============================================
+
+### Get all products
+GET http://localhost:5050/api/products
+
+###
+
+### Create a product
+POST http://localhost:5050/api/products
+Content-Type: application/json
+
+{
+  "name": "Snake Plant",
+  "price": 25,
+  "description": "Low maintenance indoor plant",
+  "category": "Indoor Plants",
+  "stock": 10
+}
+
+###
+
+### Update a product (replace PRODUCT_ID)
+PUT http://localhost:5050/api/products/PRODUCT_ID
+Content-Type: application/json
+
+{
+  "price": 30,
+  "stock": 5
+}
+
+###
+
+### Delete a product (replace PRODUCT_ID)
+DELETE http://localhost:5050/api/products/PRODUCT_ID
+
+### =============================================
+### 11. SERVICES
+### =============================================
+
+### Get all services
+GET http://localhost:5050/api/services
+
+###
+
+### Create a service
+POST http://localhost:5050/api/services
+Content-Type: application/json
+
+{
+  "name": "Plant Consultation",
+  "description": "One-on-one plant care advice",
+  "price": 50,
+  "duration": "1 hour"
+}
+
+###
+
+### Update a service (replace SERVICE_ID)
+PUT http://localhost:5050/api/services/SERVICE_ID
+Content-Type: application/json
+
+{
+  "price": 60
+}
+
+###
+
+### Delete a service (replace SERVICE_ID)
+DELETE http://localhost:5050/api/services/SERVICE_ID
+
+### =============================================
+### 12. SERVICE REQUESTS
+### =============================================
+
+### Get all service requests
+GET http://localhost:5050/api/service-requests
+
+###
+
+### Create a service request
+POST http://localhost:5050/api/service-requests
+Content-Type: application/json
+
+{
+  "customerName": "Hana",
+  "service": "Plant Consultation",
+  "date": "2026-05-10",
+  "notes": "Need help with my roses"
+}
+
+###
+
+### Update a service request (replace REQUEST_ID)
+PUT http://localhost:5050/api/service-requests/REQUEST_ID
+Content-Type: application/json
+
+{
+  "status": "Completed"
+}
+
+###
+
+### Delete a service request (replace REQUEST_ID)
+DELETE http://localhost:5050/api/service-requests/REQUEST_ID
+
+### =============================================
+### 13. STORE
+### =============================================
+
+### Get store info
+GET http://localhost:5050/api/stores
+
+###
+
+### Update store info
+PUT http://localhost:5050/api/stores
+Content-Type: application/json
+
+{
+  "name": "Green Haven Plant Store",
+  "phone": "0501234567",
+  "location": "Riyadh, Saudi Arabia",
+  "about": "Your go-to store for all things plants."
+}
+
+### =============================================
+### 14. SUBSCRIPTIONS
+### =============================================
+
+### Get all subscription plans
+GET http://localhost:5050/api/subscriptions
+
+###
+
+### Create a subscription plan
+POST http://localhost:5050/api/subscriptions
+Content-Type: application/json
+
+{
+  "name": "Basic",
+  "price": 29,
+  "duration": "monthly",
+  "features": ["Access to guides", "Forum access"]
+}
+
+###
+
+### Update a subscription plan (replace PLAN_ID)
+PUT http://localhost:5050/api/subscriptions/PLAN_ID
+Content-Type: application/json
+
+{
+  "price": 35
+}
+
+### =============================================
+### 15. BADGES
+### =============================================
+
+### Get all badge rules
+GET http://localhost:5050/api/badges/rules
+
+###
+
+### Get all experts for badge assignment
+GET http://localhost:5050/api/badges/experts
+
+###
+
+### Assign badge to expert (replace EXPERT_ID)
+PUT http://localhost:5050/api/badges/experts/EXPERT_ID/assign
+Content-Type: application/json
+
+{
+  "currentBadge": "Gold",
+  "badgeColor": "bg-yellow-400"
+}
+
+###
+
+### Remove badge from expert (replace EXPERT_ID)
+PUT http://localhost:5050/api/badges/experts/EXPERT_ID/remove
+
+### =============================================
+### 16. CHAT (replace TOKEN)
+### =============================================
+
+### Chat with plant care chatbot
+POST http://localhost:5050/api/chat
+Content-Type: application/json
+Authorization: Bearer TOKEN
+
+{
+  "messages": [
+    { "role": "user", "content": "How do I water my plants?" }
+  ]
+}

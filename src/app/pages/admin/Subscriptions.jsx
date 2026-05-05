@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Edit, Users, Check } from "lucide-react";
 
 export default function Subscriptions() {
@@ -12,7 +12,7 @@ export default function Subscriptions() {
   }, []);
 
   const fetchPlans = async () => {
-    const res = await fetch("http://localhost:5050/api/subscriptions");
+    const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/subscriptions`);
     const data = await res.json();
 
     setPlans(

@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Eye, EyeOff, Loader2, Upload, X } from "lucide-react";
 
@@ -29,7 +29,7 @@ export default function StoreAuth() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5050/api/auth/login", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: loginEmail, password: loginPassword }),
@@ -70,7 +70,7 @@ export default function StoreAuth() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5050/api/auth/register", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

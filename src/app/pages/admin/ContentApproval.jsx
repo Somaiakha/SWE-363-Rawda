@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Eye, CheckCircle, Edit, XCircle } from "lucide-react";
 
 export default function ContentApproval() {
@@ -16,7 +16,7 @@ export default function ContentApproval() {
 
   const fetchGuides = async () => {
     try {
-      const res = await fetch("http://localhost:5050/api/guides");
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/guides`);
       const data = await res.json();
 
       const formatted = data.map((g) => ({

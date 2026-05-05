@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { Button } from "../components/ui/Button";
 import { Search, Filter, History, Clock, CheckCircle, XCircle, Eye, Loader2 } from "lucide-react";
 
-const API = "http://localhost:5050/api";
+const API = `${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}`;
 
 function authHeaders() {
   const token = localStorage.getItem("token");

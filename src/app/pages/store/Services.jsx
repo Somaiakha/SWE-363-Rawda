@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import axios from "axios";
 import {
   Plus,
@@ -38,7 +38,7 @@ export default function Services() {
     try {
       const res =
         await axios.get(
-          "http://localhost:5050/api/services"
+          `${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/services`
         );
 
       setServices(res.data);
@@ -88,7 +88,7 @@ export default function Services() {
     try {
       if (mode === "add") {
         await axios.post(
-          "http://localhost:5050/api/services",
+          `${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/services`,
           formData
         );
       } else {

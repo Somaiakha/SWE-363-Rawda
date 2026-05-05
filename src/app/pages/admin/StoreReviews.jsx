@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Star, Trash2, CheckCircle, Filter } from "lucide-react";
 
 export default function StoreReviews() {
@@ -11,7 +11,7 @@ export default function StoreReviews() {
   }, []);
 
   const fetchReviews = async () => {
-    const res = await fetch("http://localhost:5050/api/reviews");
+    const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/reviews`);
     const data = await res.json();
 
     const formatted = data.map((r) => ({

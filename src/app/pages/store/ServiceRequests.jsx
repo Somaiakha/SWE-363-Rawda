@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import axios from "axios";
 import {
   CheckCircle,
@@ -45,7 +45,7 @@ export default function ServiceRequests() {
   async () => {
     const res =
     await axios.get(
-      "http://localhost:5050/api/service-requests"
+      `${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/service-requests`
     );
 
     setRequests(res.data);

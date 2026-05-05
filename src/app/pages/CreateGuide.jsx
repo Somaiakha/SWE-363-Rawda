@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Button } from "../components/ui/Button";
 import { ArrowLeft, UploadCloud, FileText, Image, Save, Loader2 } from "lucide-react";
@@ -46,7 +46,7 @@ export default function CreateGuide() {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch("http://localhost:5050/api/guides", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/guides`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

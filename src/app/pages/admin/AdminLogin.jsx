@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 
@@ -18,7 +18,7 @@ export default function AdminLogin() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5050/api/auth/login", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -32,7 +32,7 @@ export default function AdminLogin() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.message || "Invalid email/password");
+        setError(data.message || "Invalid email or password");
         setIsLoading(false);
         return;
       }
@@ -140,7 +140,7 @@ export default function AdminLogin() {
                 )}
               </button>
 
-              {/* ✅ BACK BUTTON (what you wanted) */}
+              {/* Back Button */}
               <button
                   type="button"
                   onClick={() => navigate("/")}
@@ -151,10 +151,15 @@ export default function AdminLogin() {
 
             </form>
 
-            {/* Info */}
+            {/* ✅ DEMO CREDENTIALS (ADDED HERE) */}
             <div className="mt-6 pt-4 border-t text-center text-sm text-gray-500">
-              <p>Use your MongoDB account</p>
+              <p className="font-medium text-gray-700 mb-1">
+                Demo Admin Credentials
+              </p>
+              <p>Email: <b>Raghada1@gmail.com</b></p>
+              <p>Password: <b>123456</b></p>
             </div>
+
           </div>
         </div>
 

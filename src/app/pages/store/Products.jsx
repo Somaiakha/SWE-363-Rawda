@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import axios from "axios";
 import {
   Plus,
@@ -37,7 +37,7 @@ export default function Products() {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get("http://localhost:5050/api/products");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/products`);
       setProducts(res.data);
     } catch (err) {
       console.log(err);
@@ -83,7 +83,7 @@ export default function Products() {
   const handleSave = async () => {
     try {
       if (modalMode === "add") {
-        await axios.post("http://localhost:5050/api/products", formData);
+        await axios.post(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/products`, formData);
         showToast("Product Added");
       } else {
         await axios.put(

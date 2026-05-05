@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Search, Filter, Edit, Trash2, CheckCircle, XCircle } from "lucide-react";
 
 export default function ManageUsers() {
@@ -18,7 +18,7 @@ export default function ManageUsers() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch("http://localhost:5050/api/users");
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/users`);
       const data = await res.json();
 
       const formattedUsers = data.map((user) => ({

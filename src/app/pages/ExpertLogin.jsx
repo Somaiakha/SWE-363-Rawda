@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 
@@ -17,7 +17,7 @@ export default function ExpertLogin() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5050/api/auth/login", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

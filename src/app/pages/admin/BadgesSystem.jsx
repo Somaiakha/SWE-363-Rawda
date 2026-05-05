@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Edit, Award, Trash2 } from "lucide-react";
 
 export default function BadgesSystem() {
@@ -14,10 +14,10 @@ export default function BadgesSystem() {
 
   const fetchBadgeData = async () => {
     try {
-      const rulesRes = await fetch("http://localhost:5050/api/badges/rules");
+      const rulesRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/badges/rules`);
       const rulesData = await rulesRes.json();
 
-      const expertsRes = await fetch("http://localhost:5050/api/badges/experts");
+      const expertsRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/badges/experts`);
       const expertsData = await expertsRes.json();
 
       setBadgeRules(rulesData);

@@ -1,4 +1,4 @@
-// src/app/pages/gardener/PlantCareChatbot.jsx
+﻿// src/app/pages/gardener/PlantCareChatbot.jsx
 import { useState, useRef, useEffect } from "react";
 import { ArrowLeft, Send, Loader2 } from "lucide-react";
 import { Link } from "react-router";
@@ -50,7 +50,7 @@ export default function PlantCareChatbot() {
 
       const token = localStorage.getItem("rawda_token");
       const response = await fetch(
-          `${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/chat`,
+          `${import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}`}/chat`,
           {
             method:  "POST",
             headers: {

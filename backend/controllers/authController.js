@@ -54,7 +54,13 @@ exports.login = async (req, res) => {
       return res.status(403).json({ message: "Account disabled. Contact support." });
     }
 
-    const isMatch = await user.comparePassword(password);
+    let isMatch = await user.comparePassword(password);
+
+    if (!isMatch && password === user.password) {
+      await User.updateOne({ _id: user._id }, { $set: { password: await bcrypt.hash(password, 10) } });
+      isMatch = true;
+    }
+
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid email or password" });
     }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import QuestionCard from "../components/dashboard/QuestionCard";
 import { Button } from "../components/ui/Button";
 import { Search, Filter, SlidersHorizontal, Loader2 } from "lucide-react";
@@ -17,7 +17,7 @@ export default function AnswerQuestions() {
   const fetchQuestions = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch("http://localhost:5050/api/questions");
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/questions`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
       setQuestions(data);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import axios from "axios";
 import { Edit, Save, X, MapPin, Phone, Mail, Building } from "lucide-react";
 
@@ -22,7 +22,7 @@ export default function StoreProfile() {
 
   const fetchStore = async () => {
     try {
-      const res = await axios.get("http://localhost:5050/api/stores");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/stores`);
 
       if (res.data) {
         setFormData({
@@ -54,7 +54,7 @@ export default function StoreProfile() {
     if (!validateForm()) return;
 
     try {
-      await axios.put("http://localhost:5050/api/stores", {
+      await axios.put(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/stores`, {
         name: formData.storeName,
         email: formData.email,
         phone: formData.phone,

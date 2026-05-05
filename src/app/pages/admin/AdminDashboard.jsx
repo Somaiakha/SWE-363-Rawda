@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import {
   Users,
@@ -27,7 +27,7 @@ export default function AdminDashboard() {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch("http://localhost:5050/api/admin/stats");
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/admin/stats`);
       const data = await res.json();
       setStats(data);
     } catch {
@@ -37,7 +37,7 @@ export default function AdminDashboard() {
 
   const fetchRecentActivity = async () => {
     try {
-      const res = await fetch("http://localhost:5050/api/admin/recent-activity");
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/admin/recent-activity`);
       const data = await res.json();
       setRecentActivity(data);
     } catch {

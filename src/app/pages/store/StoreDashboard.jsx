@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+﻿import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import {
@@ -23,9 +23,9 @@ export default function StoreDashboard() {
 
   const loadData = async () => {
     try {
-      const p = await axios.get("http://localhost:5050/api/products");
-      const s = await axios.get("http://localhost:5050/api/services");
-      const r = await axios.get("http://localhost:5050/api/service-requests");
+      const p = await axios.get(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/products`);
+      const s = await axios.get(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/services`);
+      const r = await axios.get(`${import.meta.env.VITE_API_URL || "http://localhost:5050/api"}/service-requests`);
 
       setProducts(p.data);
       setServices(s.data);

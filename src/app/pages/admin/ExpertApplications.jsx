@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Eye, CheckCircle, XCircle, FileText } from "lucide-react";
+import { Eye, CheckCircle, XCircle, FileText, Trash2 } from "lucide-react";
 
 export default function ExpertApplications() {
   const [applications, setApplications] = useState([]);
@@ -13,42 +13,76 @@ export default function ExpertApplications() {
 
   const fetchApplications = async () => {
     try {
-      const res = await fetch("http://localhost:5050/api/experts");
+      const res = await fetch(
+          `http://localhost:5050/api/experts?t=${Date.now()}`,
+          { cache: "no-store" }
+      );
+
       const data = await res.json();
+      console.log("FETCH DATA:", data);
 
       const formatted = data.map((user) => ({
         id: user._id,
         name: user.name,
         email: user.email,
         yearsExperience: user.yearsExperience || 0,
-        submittedDate: user.createdAt
-            ? new Date(user.createdAt).toLocaleDateString()
-            : "N/A",
-        status: user.expertStatus || "Pending",
+        status: user.expertStatus || "Pending", // ✅ correct field
         bio: user.bio,
-        certificates: user.certificates,
+        certificates: user.certificates || [],
       }));
 
       setApplications(formatted);
-    } catch {
-      console.error("Failed to fetch experts");
+    } catch (error) {
+      console.error("Fetch error:", error);
     }
   };
 
-  const updateStatus = async (id, status) => {
+  const updateStatus = async (id, newStatus) => {
     try {
-      await fetch(`http://localhost:5050/api/experts/${id}/status`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ expertStatus: status }),
-      });
+      const res = await fetch(
+          `http://localhost:5050/api/experts/${id}/status`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ expertStatus: newStatus }),
+          }
+      );
 
-      fetchApplications();
-      showToast(`Application ${status}`);
-    } catch {
+      const data = await res.json();
+      console.log("UPDATE RESPONSE:", data);
+
+      if (!res.ok) {
+        showToast(data.message || "Error updating status");
+        return;
+      }
+
+      await fetchApplications(); // 🔥 force refresh
+      showToast(`Application ${newStatus}`);
+    } catch (error) {
+      console.error(error);
       showToast("Error updating status");
+    }
+  };
+
+  const deleteExpert = async (id) => {
+    try {
+      const res = await fetch(
+          `http://localhost:5050/api/experts/${id}`,
+          {
+            method: "DELETE",
+          }
+      );
+
+      if (!res.ok) {
+        showToast("Delete failed");
+        return;
+      }
+
+      await fetchApplications(); // 🔥 force refresh
+      showToast("Expert deleted");
+    } catch (error) {
+      console.error(error);
+      showToast("Error deleting expert");
     }
   };
 
@@ -69,7 +103,6 @@ export default function ExpertApplications() {
   return (
       <div className="max-w-7xl mx-auto">
 
-        {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Expert Applications
@@ -79,7 +112,6 @@ export default function ExpertApplications() {
           </p>
         </div>
 
-        {/* Table */}
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-50">
@@ -113,30 +145,38 @@ export default function ExpertApplications() {
                   </span>
                   </td>
 
-                  <td className="p-4 flex gap-2">
-                    <button onClick={() => handleViewDetails(app)}>
-                      <Eye />
-                    </button>
+                  <td className="p-4">
+                    <div className="flex gap-3 items-center">
 
-                    {app.status === "Pending" && (
-                        <>
-                          <button
-                              onClick={() =>
-                                  updateStatus(app.id, "Approved")
-                              }
-                          >
-                            <CheckCircle className="text-green-600" />
-                          </button>
+                      <button onClick={() => handleViewDetails(app)}>
+                        <Eye />
+                      </button>
 
-                          <button
-                              onClick={() =>
-                                  updateStatus(app.id, "Rejected")
-                              }
-                          >
-                            <XCircle className="text-red-600" />
-                          </button>
-                        </>
-                    )}
+                      {app.status === "Pending" && (
+                          <>
+                            <button
+                                onClick={() =>
+                                    updateStatus(app.id, "Approved")
+                                }
+                            >
+                              <CheckCircle className="text-green-600" />
+                            </button>
+
+                            <button
+                                onClick={() =>
+                                    updateStatus(app.id, "Rejected")
+                                }
+                            >
+                              <XCircle className="text-red-600" />
+                            </button>
+                          </>
+                      )}
+
+                      <button onClick={() => deleteExpert(app.id)}>
+                        <Trash2 className="text-red-600" />
+                      </button>
+
+                    </div>
                   </td>
                 </tr>
             ))}
@@ -144,7 +184,6 @@ export default function ExpertApplications() {
           </table>
         </div>
 
-        {/* Details Modal */}
         {showDetailModal && selectedApplication && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
               <div className="bg-white p-6 rounded-xl w-[500px]">
@@ -161,19 +200,9 @@ export default function ExpertApplications() {
                     <p className="mb-4">{selectedApplication.bio}</p>
                 )}
 
-                {selectedApplication.certificates && (
-                    <div>
-                      {selectedApplication.certificates.map((c, i) => (
-                          <div key={i} className="flex gap-2">
-                            <FileText /> {c}
-                          </div>
-                      ))}
-                    </div>
-                )}
-
                 <button
                     onClick={() => setShowDetailModal(false)}
-                    className="mt-4 px-4 py-2 border"
+                    className="mt-4 px-4 py-2 border rounded-lg"
                 >
                   Close
                 </button>
@@ -189,4 +218,3 @@ export default function ExpertApplications() {
       </div>
   );
 }
-
